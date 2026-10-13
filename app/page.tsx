@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { discoverMovies } from "./service/tmdb-service";
+import MovieFilterCard from "@/components/movieList/MovieFilterCard";
 
 async function DiscoverMovies() {
   try {
@@ -16,6 +17,7 @@ export default function Home() {
   return (
     <Suspense fallback={null}>
       <DiscoverMovies />
+      <MovieFilterCard />
     </Suspense>
   );
 }
