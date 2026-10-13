@@ -1,28 +1,31 @@
+import axios, { type AxiosRequestConfig } from "axios";
 import { ApiDomainConfig, Domain } from "./routes";
 
 export function callApi<T = unknown>(
   domain: Domain,
   url: `/${string}`,
-  optionInput?: RequestInit,
+  optionInput?: Omit<AxiosRequestConfig, "url" | "baseURL">,
 ): Promise<T> {
   const config = ApiDomainConfig[domain];
-  const headers = new Headers(config.headers);
-  new Headers(optionInput?.headers).forEach((value, key) => {
-    headers.set(key, value);
+  const client = axios.create({
+    baseURL: config.url,
+    headers: Object.fromEntries(new Headers(config.headers)),
   });
 
-  return fetch(`${config.url}${url}`, {
+  return client.request<T>({
     ...optionInput,
-    headers,
+    url,
+    responseType: "json",
+    transitional: { silentJSONParsing: false },
   })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      return response.json();
-    })
+    .then((response) => response.data)
     .catch((error) => {
-      console.error("Error during API call:", error);
-      throw error;
+      const apiError = axios.isAxiosError(error) && error.response
+        ? new Error(`HTTP error with status: ${error.response.status}`)
+        : error;
+      console.error("Error during API call:", apiError instanceof Error
+        ? apiError.message
+        : "Unknown API error");
+      throw apiError;
     });
 }
