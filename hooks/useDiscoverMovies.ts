@@ -3,10 +3,11 @@
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 import type { DiscoverMovieResponse } from "@/app/contracts/discover-movie";
+import { discoverMoviesQueryKey } from "@/lib/discover-movie-query";
 
-export function useDiscoverMovies(query: string, initialData?: DiscoverMovieResponse) {
+export function useDiscoverMovies(query: string) {
   return useQuery({
-    queryKey: ["discover-movies", query],
+    queryKey: discoverMoviesQueryKey(query),
     queryFn: async ({ signal }) => {
       const { data } = await axios.get<DiscoverMovieResponse>(
         `/api/discover/movie${query ? `?${query}` : ""}`,
@@ -14,7 +15,8 @@ export function useDiscoverMovies(query: string, initialData?: DiscoverMovieResp
       );
       return data;
     },
-    initialData,
+    // SSR reads the hydrated cache; relative API requests run in the browser.
+    enabled: typeof window !== "undefined",
     staleTime: 60_000,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
