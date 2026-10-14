@@ -1,62 +1,41 @@
-import type { DiscoverMovie } from "@/app/contracts/discover-movie";
-import MovieList from "@/components/movieList/MovieList";
+import { Suspense } from "react";
+import { io } from "next/cache";
+import type { DiscoverMovieResponse } from "@/app/contracts/discover-movie";
+import { discoverMovies } from "@/app/service/tmdb-service";
+import DiscoverMovieList from "@/components/movieList/DiscoverMovieList";
 import MovieFilterCard from "@/components/movieList/MovieFilterCard";
 
-const mockMovie: DiscoverMovie = {
-  id: 157336,
-  title: "Interstellar",
-  original_title: "Interstellar",
-  original_language: "en",
-  overview:
-    "A team of explorers travels beyond our galaxy to discover whether mankind has a future among the stars.",
-  poster_path: "/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg",
-  backdrop_path: null,
-  release_date: "2014-11-05",
-  genre_ids: [12, 18, 878],
-  vote_average: 8.4,
-  vote_count: 1000,
-  popularity: 100,
-  adult: false,
-  video: false,
-};
+async function InitialMovies() {
+  await io();
+  let initialData: DiscoverMovieResponse;
+  try {
+    initialData = await discoverMovies("");
+  } catch {
+    return (
+      <p role="alert" className="rounded-xl border border-destructive/30 px-6 py-12 text-center text-sm text-destructive">
+        Unable to load movies. Please try refreshing the page.
+      </p>
+    );
+  }
 
-const mockMovies: DiscoverMovie[] = [
-  mockMovie,
-  {
-    ...mockMovie,
-    id: 2,
-    title: "The Last Signal",
-    original_title: "The Last Signal",
-    overview: "",
-    poster_path: null,
-    release_date: "2024-04-12",
-    vote_average: 7.6,
-  },
-  {
-    ...mockMovie,
-    id: 3,
-    title: "Beyond Tomorrow",
-    original_title: "Beyond Tomorrow",
-    overview: "",
-    poster_path: null,
-    release_date: "",
-    vote_average: 0,
-    vote_count: 0,
-  },
-];
+  return <DiscoverMovieList initialData={initialData} />;
+}
 
 export default function Home() {
   return (
     <main className="mx-auto w-full max-w-6xl space-y-8 px-4 py-8 sm:px-6">
       <MovieFilterCard />
-      <section aria-labelledby="movie-preview-title" className="space-y-4">
-        <div>
-          <h1 id="movie-preview-title" className="text-2xl font-semibold tracking-tight">
-            Movie list preview
-          </h1>
-          <p className="text-sm text-muted-foreground">Mock movie data</p>
-        </div>
-        <MovieList movies={mockMovies} />
+      <section aria-labelledby="movie-list-title" className="space-y-4">
+        <h1 id="movie-list-title" className="text-2xl font-semibold tracking-tight">
+          Discover movies
+        </h1>
+        <Suspense fallback={
+          <p role="status" className="rounded-xl border px-6 py-12 text-center text-sm text-muted-foreground">
+            Loading movies…
+          </p>
+        }>
+          <InitialMovies />
+        </Suspense>
       </section>
     </main>
   );
