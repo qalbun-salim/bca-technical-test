@@ -2,19 +2,23 @@
 
 import { createContext, useContext, useState, type ReactNode } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { movieFiltersToQuery, type MovieFilterValues } from "@/lib/movie-filters";
+import { movieFiltersToQuery, buildMoviePageQuery, type MovieFilterValues } from "@/lib/movie-filters";
+import { maxMoviePages } from "@/lib/movie-pagination";
 import { discoverMoviesQueryKey } from "@/lib/discover-movie-query";
 
 type MovieFiltersContextValue = {
   query: string;
   applyFilters: (filters: MovieFilterValues) => void;
   clearFilters: () => void;
+  goToPage: (page: number) => void;
 };
 
 const MovieFiltersContext = createContext<MovieFiltersContextValue | null>(null);
 
 export function MovieFiltersProvider({ children }: { children: ReactNode }) {
-  const [query, setQuery] = useState("");
+  const [filterQuery, setFilterQuery] = useState("");
+  const [page, setPage] = useState(1);
+  const query = buildMoviePageQuery(filterQuery, page);
   const queryClient = useQueryClient();
 
   function applyFilters(filters: MovieFilterValues) {
@@ -22,7 +26,8 @@ export function MovieFiltersProvider({ children }: { children: ReactNode }) {
     if (nextQuery === query) {
       void queryClient.invalidateQueries({ queryKey: discoverMoviesQueryKey(query), exact: true });
     } else {
-      setQuery(nextQuery);
+      setFilterQuery(nextQuery);
+      setPage(1);
     }
   }
 
@@ -31,7 +36,11 @@ export function MovieFiltersProvider({ children }: { children: ReactNode }) {
       query,
       applyFilters,
       clearFilters: () => {
-        setQuery("");
+        setFilterQuery("");
+        setPage(1);
+      },
+      goToPage: (nextPage) => {
+        if (Number.isInteger(nextPage) && nextPage >= 1 && nextPage <= maxMoviePages) setPage(nextPage);
       },
     }}>
       {children}

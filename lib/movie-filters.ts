@@ -18,6 +18,13 @@ export function movieFiltersToQuery(filters: MovieFilterValues): string {
   return params.toString();
 }
 
+export function buildMoviePageQuery(query: string, page: number): string {
+  const params = new URLSearchParams(query);
+  if (page > 1) params.set("page", String(page));
+  else params.delete("page");
+  return params.toString();
+}
+
 export function releaseYearOptions(currentYear: number) {
   return [
     { label: "All years", value: null },

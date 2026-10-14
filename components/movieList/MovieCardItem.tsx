@@ -34,15 +34,15 @@ export default function MovieCardItem({ movie }: { movie: DiscoverMovie }) {
 
         <CardHeader className="gap-2 p-3">
           <CardTitle>
-            <h3 className="line-clamp-2">{movie.title}</h3>
+            <h3 className="line-clamp-2 min-h-[2lh]">{movie.title}</h3>
           </CardTitle>
-          <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
-            <CardDescription className="text-xs">
+          <div className="flex min-h-9 flex-col items-start justify-end gap-1 sm:min-h-4 sm:flex-row sm:items-center sm:justify-between">
+            <CardDescription className="w-full truncate text-xs sm:w-auto">
               {releaseYear || "Release date unavailable"}
             </CardDescription>
             {hasRating ? (
               <span
-                className="inline-flex items-center gap-1 text-xs font-medium tabular-nums"
+                className="inline-flex items-center gap-1 whitespace-nowrap text-xs font-medium tabular-nums"
                 aria-label={`Rating ${movie.vote_average.toFixed(1)} out of 10`}
               >
                 <Star
@@ -53,7 +53,7 @@ export default function MovieCardItem({ movie }: { movie: DiscoverMovie }) {
                 <span className="font-normal text-muted-foreground">/ 10</span>
               </span>
             ) : (
-              <span className="text-xs text-muted-foreground">Not rated</span>
+              <span className="whitespace-nowrap text-xs text-muted-foreground">Not rated</span>
             )}
           </div>
         </CardHeader>
