@@ -48,6 +48,14 @@ async function BrowseMovies({ searchParams }: { searchParams: SearchParams }) {
 
   return (
     <MovieFiltersProvider>
+      <section aria-labelledby="movie-list-title" className="space-y-4">
+        <h1 className="text-2xl text-center font-semibold tracking-tight">
+          MoviesDB
+        </h1>
+        <p className="text-center text-muted-foreground">
+          Browse your favourite movies!
+        </p>
+      </section>
       <MovieFilterCard currentYear={currentYear} />
       <section aria-labelledby="movie-list-title" className="space-y-4">
         <h1 id="movie-list-title" className="text-2xl font-semibold tracking-tight">
