@@ -1,10 +1,10 @@
-This is MovieDB: A website where you can search your favourite movies! This project is a submission for BCA technical test
+This is MovieDB: A website where you can search your favourite movies! This project is a submission for BCA technical test.
 
 ## Key Decisions
 
 Requirement Summary: A Movie Catalog website with search and filter. Each item in the catalog can be pressed to open the movie detail. The data is fetched from TMDB API.
 
-These decisions below are made
+These decisions below are made based on assessing the product, security, and performance:
 
 ### Decision 1: Implement API proxy to keep the TMDB API Key in server
 
