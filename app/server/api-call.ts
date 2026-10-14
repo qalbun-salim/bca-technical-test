@@ -1,6 +1,13 @@
 import axios, { type AxiosRequestConfig } from "axios";
 import { ApiDomainConfig, Domain } from "./routes";
 
+export class ApiError extends Error {
+  constructor(public readonly status: number) {
+    super(`HTTP error with status: ${status}`);
+    this.name = "ApiError";
+  }
+}
+
 export function callApi<T = unknown>(
   domain: Domain,
   url: `/${string}`,
@@ -21,7 +28,7 @@ export function callApi<T = unknown>(
     .then((response) => response.data)
     .catch((error) => {
       const apiError = axios.isAxiosError(error) && error.response
-        ? new Error(`HTTP error with status: ${error.response.status}`)
+        ? new ApiError(error.response.status)
         : error;
       console.error("Error during API call:", apiError instanceof Error
         ? apiError.message

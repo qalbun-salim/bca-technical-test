@@ -1,7 +1,8 @@
 import { cacheLife } from "next/cache";
+import type { MovieDetails } from "@/app/contracts/movie-details";
 import type { DiscoverMovieResponse } from "@/app/contracts/discover-movie";
 import type { MovieGenresResponse } from "@/app/contracts/movie-genres";
-import { callApi } from "@/app/server/api-call";
+import { ApiError, callApi } from "@/app/server/api-call";
 import { Domain } from "@/app/server/routes";
 
 export async function getMovieGenres(): Promise<MovieGenresResponse> {
@@ -36,4 +37,18 @@ export async function searchMovies(
     method: "GET",
     params: { query, page, language: "en-US" },
   });
+}
+
+export async function getMovieDetails(movieId: string): Promise<MovieDetails | null> {
+  "use cache";
+  cacheLife({ stale: 300, revalidate: 300, expire: 3600 });
+  try {
+    return await callApi<MovieDetails>(Domain.TMDB, `/movie/${encodeURIComponent(movieId)}`, {
+      method: "GET",
+      params: { language: "en-US", append_to_response: "credits" },
+    });
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) return null;
+    throw error;
+  }
 }
