@@ -34,7 +34,7 @@ export function MovieFiltersProvider({ children }: { children: ReactNode }) {
 
   function applyFilters(nextFilters: MovieFilterValues) {
     const params = new URLSearchParams(movieFiltersToQuery(nextFilters));
-    if (sort) params.set("sort_by", sort);
+    if (nextFilters.category === "all" && sort) params.set("sort_by", sort);
     navigate(params.toString());
   }
 
@@ -43,7 +43,7 @@ export function MovieFiltersProvider({ children }: { children: ReactNode }) {
       query,
       filters,
       applyFilters,
-      clearFilters: () => navigate(sort ? new URLSearchParams({ sort_by: sort }).toString() : ""),
+      clearFilters: () => navigate(""),
       goToPage: (nextPage) => {
         if (Number.isInteger(nextPage) && nextPage >= 1 && nextPage <= maxMoviePages) {
           navigate(buildMoviePageQuery(query, nextPage));

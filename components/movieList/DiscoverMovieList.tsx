@@ -5,6 +5,23 @@ import MovieList from "./MovieList";
 import { Button } from "../ui/button";
 import { useMovieFilters } from "./MovieFiltersProvider";
 import MoviePagination from "./MoviePagination";
+import { isMovieReleaseCategory, movieCategoryOptions, movieReleaseRegion } from "@/lib/movie-categories";
+
+export function MovieListHeading() {
+  const { filters } = useMovieFilters();
+  const category = movieCategoryOptions.find((option) => option.value === filters.category);
+
+  return (
+    <div className="space-y-1">
+      <h2 id="movie-list-title" className="text-2xl font-semibold tracking-tight">
+        {filters.category === "all" ? "Discover movies" : category?.label}
+      </h2>
+      {isMovieReleaseCategory(filters.category) && (
+        <p className="text-sm text-muted-foreground">Theatrical releases · {movieReleaseRegion.label}</p>
+      )}
+    </div>
+  );
+}
 
 export default function DiscoverMovieList() {
   const { query, goToPage } = useMovieFilters();

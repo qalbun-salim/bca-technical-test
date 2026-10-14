@@ -3,7 +3,7 @@ import { cacheLife } from "next/cache";
 import { HydrationBoundary, type DehydratedState } from "@tanstack/react-query";
 import { getInitialMovieQueryState } from "@/app/service/discover-movie-hydration";
 import { getBrowseState } from "@/lib/browse-context";
-import DiscoverMovieList from "@/components/movieList/DiscoverMovieList";
+import DiscoverMovieList, { MovieListHeading } from "@/components/movieList/DiscoverMovieList";
 import MovieFilterCard from "@/components/movieList/MovieFilterCard";
 import MovieCardSkeleton from "@/components/movieList/MovieCardSkeleton";
 import { MovieFiltersProvider } from "@/components/movieList/MovieFiltersProvider";
@@ -58,9 +58,7 @@ async function BrowseMovies({ searchParams }: { searchParams: SearchParams }) {
       </section>
       <MovieFilterCard currentYear={currentYear} />
       <section aria-labelledby="movie-list-title" className="space-y-4">
-        <h1 id="movie-list-title" className="text-2xl font-semibold tracking-tight">
-          Discover movies
-        </h1>
+        <MovieListHeading />
         <Suspense fallback={<MoviesSkeleton />}>
           <InitialMovies query={query} />
         </Suspense>
@@ -85,17 +83,27 @@ function MoviesSkeleton() {
 function BrowseSkeleton() {
   return (
     <div className="space-y-8">
-      <Card aria-hidden="true" className="bg-card p-16 grid grid-cols-[repeat(3,minmax(0,1fr))_auto_auto] grid-rows-[auto_auto] gap-x-4 gap-y-2">
-        {Array.from({ length: 3 }, (_, index) => (
-          <div key={index} className="row-span-2 grid min-w-0 grid-rows-subgrid">
-            <div className="space-y-2 self-end">
+      <Card aria-hidden="true" className="bg-card p-4 sm:p-6">
+        <div className="space-y-3">
+          <Skeleton className="h-5 w-20 motion-reduce:animate-none" />
+          <div className="flex flex-wrap gap-2">
+            {Array.from({ length: 5 }, (_, index) => (
+              <Skeleton key={index} className="h-10 w-28 motion-reduce:animate-none" />
+            ))}
+          </div>
+        </div>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          {Array.from({ length: 3 }, (_, index) => (
+            <div key={index} className="space-y-2">
               <Skeleton className="h-5 w-24 motion-reduce:animate-none" />
               <Skeleton className="h-9 w-full max-w-48 motion-reduce:animate-none" />
             </div>
-          </div>
-        ))}
-        <Skeleton className="col-start-4 row-start-1 h-9 w-28 self-end motion-reduce:animate-none" />
-        <Skeleton className="col-start-5 row-start-1 h-9 w-20 self-end motion-reduce:animate-none" />
+          ))}
+        </div>
+        <div className="flex gap-2">
+          <Skeleton className="h-8 w-28 motion-reduce:animate-none" />
+          <Skeleton className="h-8 w-20 motion-reduce:animate-none" />
+        </div>
       </Card>
       <section aria-labelledby="movie-list-loading-title" className="space-y-4">
         <h1 id="movie-list-loading-title" className="text-2xl font-semibold tracking-tight">

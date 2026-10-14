@@ -1,3 +1,4 @@
+import { getMovieCategory } from "./movie-categories";
 import { movieSortOptions } from "../app/contracts/discover-movie";
 import {
   buildMoviePageQuery,
@@ -8,16 +9,22 @@ import { maxMoviePages } from "./movie-pagination";
 
 export function getBrowseState(params: Pick<URLSearchParams, "get">) {
   const filters: MovieFilterValues = {
+    category: getMovieCategory(params.get("category")),
     genre: params.get("with_genres"),
     releaseYear: params.get("primary_release_year"),
     minimumRating: params.get("vote_average.gte"),
   };
   const requestedPage = Number(params.get("page"));
   const page =
-    Number.isInteger(requestedPage) && requestedPage >= 1 && requestedPage <= maxMoviePages
+    Number.isInteger(requestedPage) &&
+    requestedPage >= 1 &&
+    requestedPage <= maxMoviePages
       ? requestedPage
       : 1;
-  const sort = movieSortOptions.find((option) => option === params.get("sort_by"));
+  const sort =
+    filters.category === "all"
+      ? movieSortOptions.find((option) => option === params.get("sort_by"))
+      : undefined;
 
   const queryParams = new URLSearchParams(movieFiltersToQuery(filters));
   if (sort) queryParams.set("sort_by", sort);
