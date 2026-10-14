@@ -2,6 +2,7 @@ import BackToResults from "./BackToResults";
 import type { MovieDetails } from "@/app/contracts/movie-details";
 import MovieHero from "./MovieHero";
 import MovieCast from "./MovieCast";
+import MovieFacts from "./MovieFacts";
 
 export default function MovieDetail({ movie, returnTo }: { movie: MovieDetails; returnTo: string }) {
   return (
@@ -10,7 +11,10 @@ export default function MovieDetail({ movie, returnTo }: { movie: MovieDetails; 
 
       <article className="space-y-10">
         <MovieHero movie={movie} />
-        <MovieCast credits={movie.credits} />
+        <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_260px]">
+          <MovieCast credits={movie.credits} />
+          <MovieFacts movie={movie} />
+        </div>
       </article>
     </main>
   );
