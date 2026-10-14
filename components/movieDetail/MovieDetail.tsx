@@ -1,6 +1,7 @@
 import BackToResults from "./BackToResults";
 import type { MovieDetails } from "@/app/contracts/movie-details";
 import MovieHero from "./MovieHero";
+import MovieCast from "./MovieCast";
 
 export default function MovieDetail({ movie, returnTo }: { movie: MovieDetails; returnTo: string }) {
   return (
@@ -9,6 +10,7 @@ export default function MovieDetail({ movie, returnTo }: { movie: MovieDetails; 
 
       <article className="space-y-10">
         <MovieHero movie={movie} />
+        <MovieCast credits={movie.credits} />
       </article>
     </main>
   );
