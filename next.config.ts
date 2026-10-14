@@ -9,6 +9,12 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "image.tmdb.org",
+        pathname: "/t/p/w1280/**",
+        search: "",
+      },
+      {
+        protocol: "https",
+        hostname: "image.tmdb.org",
         pathname: "/t/p/w500/**",
         search: "",
       },
