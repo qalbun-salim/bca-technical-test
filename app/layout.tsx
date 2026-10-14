@@ -28,7 +28,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={cn(
         geistSans.variable,
         geistMono.variable,
-        "font-sans",
+        "font-sans dark",
         inter.variable,
       )}
     >
