@@ -18,6 +18,8 @@ type Props = {
   placeholder?: string;
   items?: { label: string; value: string | null }[];
   disabled?: boolean;
+  value?: string | null;
+  onValueChange?: (value: string | null) => void;
   errorMessage?: string;
   onRetry?: () => void;
   retryLoading?: boolean;
@@ -28,6 +30,8 @@ export default function FilterInputDropdown({
   placeholder = `Select ${label.toLowerCase()}`,
   items = [],
   disabled = false,
+  value,
+  onValueChange,
   errorMessage,
   onRetry,
   retryLoading = false,
@@ -37,7 +41,7 @@ export default function FilterInputDropdown({
     <div className="row-span-2 grid min-w-0 grid-rows-subgrid">
       <Field className="self-end">
         <FieldLabel htmlFor={id}>{label}</FieldLabel>
-        <Select items={items} disabled={disabled || items.length === 0}>
+        <Select items={items} value={value} onValueChange={onValueChange} disabled={disabled || items.length === 0}>
           <SelectTrigger id={id} className="w-full max-w-48">
             <SelectValue placeholder={placeholder} />
           </SelectTrigger>

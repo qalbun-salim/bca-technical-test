@@ -1,7 +1,14 @@
+import { cacheLife } from "next/cache";
 import { HydrationBoundary, type DehydratedState } from "@tanstack/react-query";
 import { getInitialMovieQueryState } from "@/app/service/discover-movie-hydration";
 import DiscoverMovieList from "@/components/movieList/DiscoverMovieList";
 import MovieFilterCard from "@/components/movieList/MovieFilterCard";
+
+async function getCurrentYear() {
+  "use cache";
+  cacheLife("days");
+  return new Date().getUTCFullYear();
+}
 
 async function InitialMovies() {
   let state: DehydratedState;
@@ -23,10 +30,13 @@ async function InitialMovies() {
 }
 
 export default async function Home() {
-  const initialMovies = await InitialMovies();
+  const [currentYear, initialMovies] = await Promise.all([
+    getCurrentYear(),
+    InitialMovies(),
+  ]);
   return (
     <main className="mx-auto w-full max-w-6xl space-y-8 px-4 py-8 sm:px-6">
-      <MovieFilterCard />
+      <MovieFilterCard currentYear={currentYear} />
       <section aria-labelledby="movie-list-title" className="space-y-4">
         <h1 id="movie-list-title" className="text-2xl font-semibold tracking-tight">
           Discover movies
