@@ -1,3 +1,5 @@
+import type { MovieCategory } from "@/lib/movie-categories";
+
 export const movieSortOptions = [
   "popularity.desc",
   "vote_average.desc",
@@ -8,6 +10,7 @@ export const movieSortOptions = [
 export type MovieSortBy = (typeof movieSortOptions)[number];
 
 export interface DiscoverMovieQuery {
+  category?: MovieCategory;
   page?: number;
   language?: string;
   sort_by?: MovieSortBy;

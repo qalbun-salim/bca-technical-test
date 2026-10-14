@@ -1,9 +1,48 @@
 import { cacheLife } from "next/cache";
+import { format, isAfter, isValid, parse } from "date-fns";
 import type { MovieDetails } from "@/app/contracts/movie-details";
 import type { DiscoverMovieResponse } from "@/app/contracts/discover-movie";
 import type { MovieGenresResponse } from "@/app/contracts/movie-genres";
 import { ApiError, callApi } from "@/app/server/api-call";
 import { Domain } from "@/app/server/routes";
+import {
+  getMovieCategory,
+  isMovieReleaseCategory,
+  movieReleaseRegion,
+  type MovieReleaseCategory,
+} from "@/lib/movie-categories";
+import {
+  buildDiscoverMovieParams,
+  type MovieReleaseWindow,
+} from "./discover-movie-params";
+
+async function getMovieReleaseWindow(category: MovieReleaseCategory): Promise<MovieReleaseWindow> {
+  "use cache";
+  cacheLife({ stale: 300, revalidate: 3600, expire: 7200 });
+
+  // Reuse TMDB's current date window instead of guessing how long a theatrical run lasts.
+  const { dates } = await callApi<{ dates: MovieReleaseWindow }>(
+    Domain.TMDB,
+    `/movie/${category}`,
+    { method: "GET", params: { language: "en-US", page: 1, region: movieReleaseRegion.code } },
+  );
+
+  if (!dates) {
+    throw new Error("Invalid TMDB movie release window");
+  }
+
+  const minimum = parse(dates.minimum, "yyyy-MM-dd", new Date(0));
+  const maximum = parse(dates.maximum, "yyyy-MM-dd", new Date(0));
+
+  if (!isValid(minimum) || !isValid(maximum) || isAfter(minimum, maximum)) {
+    throw new Error("Invalid TMDB movie release window");
+  }
+
+  return {
+    minimum: format(minimum, "yyyy-MM-dd"),
+    maximum: format(maximum, "yyyy-MM-dd"),
+  };
+}
 
 export async function getMovieGenres(): Promise<MovieGenresResponse> {
   "use cache";
@@ -19,7 +58,11 @@ export async function discoverMovies(
 ): Promise<DiscoverMovieResponse> {
   "use cache";
   cacheLife({ stale: 60, revalidate: 60, expire: 300 });
-  const params = new URLSearchParams(query);
+  const category = getMovieCategory(new URLSearchParams(query).get("category"));
+  const releaseWindow = isMovieReleaseCategory(category)
+    ? await getMovieReleaseWindow(category)
+    : undefined;
+  const params = buildDiscoverMovieParams(query, category, releaseWindow);
   return callApi<DiscoverMovieResponse>(
     Domain.TMDB,
     `/discover/movie?${params}`,
