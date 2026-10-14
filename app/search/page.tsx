@@ -40,7 +40,7 @@ async function SearchResults({ query, page }: { query: string; page: number }) {
   return (
     <div className="space-y-6">
       <p className="text-sm text-muted-foreground">{movies.total_results} movies found</p>
-      <MovieList movies={movies.results} />
+      <MovieList movies={movies.results} returnTo={pageHref(page)} />
       {lastPage > 1 && (
         <nav aria-label="Search result pages" className="flex flex-wrap items-center justify-center gap-4">
           {page > 1 && (

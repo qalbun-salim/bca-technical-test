@@ -21,7 +21,7 @@ export default function DiscoverMovieList() {
       {isPending && <p role="status">Loading movies…</p>}
       {data && (
         <>
-          <MovieList movies={data.results} />
+          <MovieList movies={data.results} returnTo={query ? `/?${query}` : "/"} />
           <MoviePagination page={data.page} totalPages={data.total_pages} isLoading={isFetching} onPageChange={goToPage} />
         </>
       )}

@@ -3,8 +3,10 @@ import MovieCardItem from "@/components/movieList/MovieCardItem";
 
 export default function MovieList({
   movies,
+  returnTo = "/",
 }: {
   movies: readonly DiscoverMovie[];
+  returnTo?: string;
 }) {
   if (movies.length === 0) {
     return (
@@ -22,7 +24,7 @@ export default function MovieList({
     >
       {movies.map((movie) => (
         <li key={movie.id} className="min-w-0">
-          <MovieCardItem movie={movie} />
+          <MovieCardItem movie={movie} returnTo={returnTo} />
         </li>
       ))}
     </ul>
