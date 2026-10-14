@@ -39,10 +39,7 @@ export default function MoviePagination({ page, totalPages, disabled = false, is
   }
 
   return (
-    <div className="relative space-y-2 pt-4">
-      <p role="status" className="absolute inset-x-0 top-0 text-center text-xs leading-4 text-muted-foreground">
-        {isLoading ? "Updating movies…" : ""}
-      </p>
+    <div className="pt-4">
       <Pagination aria-label="Movie pages">
         <PaginationContent>
           <PaginationItem>

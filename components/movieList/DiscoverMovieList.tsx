@@ -35,7 +35,9 @@ export default function DiscoverMovieList() {
           <Button variant="link" disabled={isFetching} onClick={() => void refetch()}>Retry</Button>
         </div>
       )}
-      {isPending && <p role="status">Loading movies…</p>}
+      <p role="status" className="min-h-5 text-right text-sm text-muted-foreground">
+        {isPending ? "Loading movies…" : isFetching ? "Updating movies…" : ""}
+      </p>
       {data && (
         <>
           <MovieList movies={data.results} returnTo={query ? `/?${query}` : "/"} />
