@@ -5,12 +5,45 @@ import { Card } from "../ui/card";
 import { Button } from "../ui/button";
 import FilterInputDropdown from "./FilterInputDropdown";
 import { useMovieGenres } from "@/hooks/useMovieGenres";
-import { emptyMovieFilters, minimumRatingOptions, releaseYearOptions } from "@/lib/movie-filters";
+import {
+  emptyMovieFilters,
+  minimumRatingOptions,
+  releaseYearOptions,
+  movieFiltersToQuery,
+  type MovieFilterValues,
+} from "@/lib/movie-filters";
 import { useMovieFilters } from "./MovieFiltersProvider";
 
-export default function MovieFilterCard({ currentYear }: { currentYear: number }) {
-  const { data: genres = [], isPending, isError, isFetching, refetch } = useMovieGenres();
-  const [filters, setFilters] = useState(emptyMovieFilters);
+export default function MovieFilterCard({
+  currentYear,
+}: {
+  currentYear: number;
+}) {
+  const { filters } = useMovieFilters();
+  return (
+    <MovieFilterForm
+      key={movieFiltersToQuery(filters)}
+      currentYear={currentYear}
+      initialFilters={filters}
+    />
+  );
+}
+
+function MovieFilterForm({
+  currentYear,
+  initialFilters,
+}: {
+  currentYear: number;
+  initialFilters: MovieFilterValues;
+}) {
+  const {
+    data: genres = [],
+    isPending,
+    isError,
+    isFetching,
+    refetch,
+  } = useMovieGenres();
+  const [filters, setFilters] = useState(initialFilters);
   const { applyFilters, clearFilters } = useMovieFilters();
 
   return (
@@ -20,10 +53,15 @@ export default function MovieFilterCard({ currentYear }: { currentYear: number }
         placeholder={isPending ? "Loading genres…" : "All genres"}
         disabled={isPending || genres.length === 0}
         value={filters.genre}
-        onValueChange={(genre) => setFilters((previous) => ({ ...previous, genre }))}
+        onValueChange={(genre) =>
+          setFilters((previous) => ({ ...previous, genre }))
+        }
         items={[
           { label: "All genres", value: null },
-          ...genres.map((genre) => ({ label: genre.name, value: String(genre.id) })),
+          ...genres.map((genre) => ({
+            label: genre.name,
+            value: String(genre.id),
+          })),
         ]}
         errorMessage={isError ? "Unable to load genres." : undefined}
         onRetry={() => void refetch()}
@@ -34,20 +72,35 @@ export default function MovieFilterCard({ currentYear }: { currentYear: number }
         placeholder="All years"
         items={releaseYearOptions(currentYear)}
         value={filters.releaseYear}
-        onValueChange={(releaseYear) => setFilters((previous) => ({ ...previous, releaseYear }))}
+        onValueChange={(releaseYear) =>
+          setFilters((previous) => ({ ...previous, releaseYear }))
+        }
       />
       <FilterInputDropdown
         label="Minimum Rating"
         placeholder="Any rating"
         items={minimumRatingOptions}
         value={filters.minimumRating}
-        onValueChange={(minimumRating) => setFilters((previous) => ({ ...previous, minimumRating }))}
+        onValueChange={(minimumRating) =>
+          setFilters((previous) => ({ ...previous, minimumRating }))
+        }
       />
-      <Button className="col-start-4 row-start-1 self-end" onClick={() => applyFilters(filters)}>Apply Filters</Button>
-      <Button className="col-start-5 row-start-1 self-end" onClick={() => {
-        setFilters(emptyMovieFilters);
-        clearFilters();
-      }}>Clear All</Button>
+      <Button
+        className="col-start-4 row-start-1 self-end"
+        onClick={() => applyFilters(filters)}
+      >
+        Apply Filters
+      </Button>
+      <Button
+        className="col-start-5 row-start-1 self-end"
+        onClick={() => {
+          if (movieFiltersToQuery(initialFilters) === "")
+            setFilters(emptyMovieFilters);
+          clearFilters();
+        }}
+      >
+        Clear All
+      </Button>
     </Card>
   );
 }

@@ -1,13 +1,16 @@
 "use client";
 
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, useContext, type ReactNode } from "react";
+import { useSearchParams } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { movieFiltersToQuery, buildMoviePageQuery, type MovieFilterValues } from "@/lib/movie-filters";
+import { browseHref, getBrowseState } from "@/lib/browse-context";
 import { maxMoviePages } from "@/lib/movie-pagination";
 import { discoverMoviesQueryKey } from "@/lib/discover-movie-query";
 
 type MovieFiltersContextValue = {
   query: string;
+  filters: MovieFilterValues;
   applyFilters: (filters: MovieFilterValues) => void;
   clearFilters: () => void;
   goToPage: (page: number) => void;
@@ -16,31 +19,35 @@ type MovieFiltersContextValue = {
 const MovieFiltersContext = createContext<MovieFiltersContextValue | null>(null);
 
 export function MovieFiltersProvider({ children }: { children: ReactNode }) {
-  const [filterQuery, setFilterQuery] = useState("");
-  const [page, setPage] = useState(1);
-  const query = buildMoviePageQuery(filterQuery, page);
+  const searchParams = useSearchParams();
+  const { query, filters, sort } = getBrowseState(searchParams);
   const queryClient = useQueryClient();
 
-  function applyFilters(filters: MovieFilterValues) {
-    const nextQuery = movieFiltersToQuery(filters);
+  function navigate(nextQuery: string) {
     if (nextQuery === query) {
       void queryClient.invalidateQueries({ queryKey: discoverMoviesQueryKey(query), exact: true });
     } else {
-      setFilterQuery(nextQuery);
-      setPage(1);
+      // Next.js synchronizes native history with useSearchParams without a server navigation.
+      window.history.pushState(null, "", browseHref(nextQuery));
     }
+  }
+
+  function applyFilters(nextFilters: MovieFilterValues) {
+    const params = new URLSearchParams(movieFiltersToQuery(nextFilters));
+    if (sort) params.set("sort_by", sort);
+    navigate(params.toString());
   }
 
   return (
     <MovieFiltersContext.Provider value={{
       query,
+      filters,
       applyFilters,
-      clearFilters: () => {
-        setFilterQuery("");
-        setPage(1);
-      },
+      clearFilters: () => navigate(sort ? new URLSearchParams({ sort_by: sort }).toString() : ""),
       goToPage: (nextPage) => {
-        if (Number.isInteger(nextPage) && nextPage >= 1 && nextPage <= maxMoviePages) setPage(nextPage);
+        if (Number.isInteger(nextPage) && nextPage >= 1 && nextPage <= maxMoviePages) {
+          navigate(buildMoviePageQuery(query, nextPage));
+        }
       },
     }}>
       {children}
