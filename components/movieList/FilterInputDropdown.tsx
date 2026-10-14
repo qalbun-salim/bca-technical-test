@@ -1,3 +1,7 @@
+"use client";
+
+import { useId } from "react";
+import { Button } from "../ui/button";
 import { Field, FieldLabel } from "../ui/field";
 import {
   Select,
@@ -12,35 +16,56 @@ import {
 type Props = {
   label: string;
   placeholder?: string;
+  items?: { label: string; value: string | null }[];
+  disabled?: boolean;
+  errorMessage?: string;
+  onRetry?: () => void;
+  retryLoading?: boolean;
 };
-const mockItems = [
-  { label: "Select a fruit", value: null },
-  { label: "Apple", value: "apple" },
-  { label: "Banana", value: "banana" },
-  { label: "Blueberry", value: "blueberry" },
-  { label: "Grapes", value: "grapes" },
-  { label: "Pineapple", value: "pineapple" },
-];
 
-export default function FilterInputDropdown({ label, placeholder }: Props) {
+export default function FilterInputDropdown({
+  label,
+  placeholder = `Select ${label.toLowerCase()}`,
+  items = [],
+  disabled = false,
+  errorMessage,
+  onRetry,
+  retryLoading = false,
+}: Props) {
+  const id = useId();
   return (
-    <Field>
-      <FieldLabel>{label}</FieldLabel>
-      <Select items={mockItems}>
-        <SelectTrigger className="w-full max-w-48">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectGroup>
-            <SelectLabel>Fruits</SelectLabel>
-            {mockItems.map((item) => (
-              <SelectItem key={item.value} value={item.value}>
-                {item.label}
-              </SelectItem>
-            ))}
-          </SelectGroup>
-        </SelectContent>
-      </Select>
-    </Field>
+    <div className="row-span-2 grid min-w-0 grid-rows-subgrid">
+      <Field className="self-end">
+        <FieldLabel htmlFor={id}>{label}</FieldLabel>
+        <Select items={items} disabled={disabled || items.length === 0}>
+          <SelectTrigger id={id} className="w-full max-w-48">
+            <SelectValue placeholder={placeholder} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectLabel>{label}</SelectLabel>
+              {items.map((item) => (
+                <SelectItem key={item.value ?? "all"} value={item.value}>
+                  {item.label}
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      </Field>
+      {errorMessage && (
+        <div className="min-w-0 self-start break-words text-sm text-destructive" role="alert">
+          {errorMessage}
+          {onRetry && (
+            <>
+              {" "}
+              <Button className="h-auto p-0" variant="link" disabled={retryLoading} onClick={onRetry}>
+                {retryLoading ? "Retrying…" : "Retry"}
+              </Button>
+            </>
+          )}
+        </div>
+      )}
+    </div>
   );
 }
