@@ -1,7 +1,17 @@
 import { cacheLife } from "next/cache";
 import type { DiscoverMovieResponse } from "@/app/contracts/discover-movie";
+import type { MovieGenresResponse } from "@/app/contracts/movie-genres";
 import { callApi } from "@/app/server/api-call";
 import { Domain } from "@/app/server/routes";
+
+export async function getMovieGenres(): Promise<MovieGenresResponse> {
+  "use cache";
+  cacheLife("days");
+  return callApi<MovieGenresResponse>(Domain.TMDB, "/genre/movie/list", {
+    method: "GET",
+    params: { language: "en" },
+  });
+}
 
 export async function discoverMovies(
   query: string,
