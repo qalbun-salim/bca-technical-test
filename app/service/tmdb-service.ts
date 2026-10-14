@@ -25,3 +25,15 @@ export async function discoverMovies(
     { method: "GET" },
   );
 }
+
+export async function searchMovies(
+  query: string,
+  page: number = 1,
+): Promise<DiscoverMovieResponse> {
+  "use cache";
+  cacheLife({ stale: 60, revalidate: 60, expire: 300 });
+  return callApi<DiscoverMovieResponse>(Domain.TMDB, "/search/movie", {
+    method: "GET",
+    params: { query, page, language: "en-US" },
+  });
+}
