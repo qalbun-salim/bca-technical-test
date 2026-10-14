@@ -3,6 +3,7 @@ import { HydrationBoundary, type DehydratedState } from "@tanstack/react-query";
 import { getInitialMovieQueryState } from "@/app/service/discover-movie-hydration";
 import DiscoverMovieList from "@/components/movieList/DiscoverMovieList";
 import MovieFilterCard from "@/components/movieList/MovieFilterCard";
+import { MovieFiltersProvider } from "@/components/movieList/MovieFiltersProvider";
 
 async function getCurrentYear() {
   "use cache";
@@ -35,6 +36,7 @@ export default async function Home() {
     InitialMovies(),
   ]);
   return (
+    <MovieFiltersProvider>
     <main className="mx-auto w-full max-w-6xl space-y-8 px-4 py-8 sm:px-6">
       <MovieFilterCard currentYear={currentYear} />
       <section aria-labelledby="movie-list-title" className="space-y-4">
@@ -44,5 +46,6 @@ export default async function Home() {
         {initialMovies}
       </section>
     </main>
+    </MovieFiltersProvider>
   );
 }

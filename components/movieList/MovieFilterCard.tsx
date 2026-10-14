@@ -6,10 +6,12 @@ import { Button } from "../ui/button";
 import FilterInputDropdown from "./FilterInputDropdown";
 import { useMovieGenres } from "@/hooks/useMovieGenres";
 import { emptyMovieFilters, minimumRatingOptions, releaseYearOptions } from "@/lib/movie-filters";
+import { useMovieFilters } from "./MovieFiltersProvider";
 
 export default function MovieFilterCard({ currentYear }: { currentYear: number }) {
   const { data: genres = [], isPending, isError, isFetching, refetch } = useMovieGenres();
   const [filters, setFilters] = useState(emptyMovieFilters);
+  const { applyFilters, clearFilters } = useMovieFilters();
 
   return (
     <Card className="bg-card p-16 grid grid-cols-[repeat(3,minmax(0,1fr))_auto_auto] grid-rows-[auto_auto] gap-x-4 gap-y-2">
@@ -41,8 +43,11 @@ export default function MovieFilterCard({ currentYear }: { currentYear: number }
         value={filters.minimumRating}
         onValueChange={(minimumRating) => setFilters((previous) => ({ ...previous, minimumRating }))}
       />
-      <Button className="col-start-4 row-start-1 self-end">Apply Filters</Button>
-      <Button className="col-start-5 row-start-1 self-end">Clear All</Button>
+      <Button className="col-start-4 row-start-1 self-end" onClick={() => applyFilters(filters)}>Apply Filters</Button>
+      <Button className="col-start-5 row-start-1 self-end" onClick={() => {
+        setFilters(emptyMovieFilters);
+        clearFilters();
+      }}>Clear All</Button>
     </Card>
   );
 }

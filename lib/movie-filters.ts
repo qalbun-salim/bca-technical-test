@@ -10,6 +10,14 @@ export const emptyMovieFilters: MovieFilterValues = {
   minimumRating: null,
 };
 
+export function movieFiltersToQuery(filters: MovieFilterValues): string {
+  const params = new URLSearchParams();
+  if (filters.genre !== null) params.set("with_genres", filters.genre);
+  if (filters.releaseYear !== null) params.set("primary_release_year", filters.releaseYear);
+  if (filters.minimumRating !== null) params.set("vote_average.gte", filters.minimumRating);
+  return params.toString();
+}
+
 export function releaseYearOptions(currentYear: number) {
   return [
     { label: "All years", value: null },
